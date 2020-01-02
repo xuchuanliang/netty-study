@@ -1,1 +1,20 @@
 # netty 学习 -- 哔哩哔哩 张龙老师
+
+# Netty in action
+-- 当实现ChannelInboundHandler或ChannelInboundHandlerAdapter的channelRead()方法时，需要自行负责释放或池化ByteBuf实例相关内存；
+但是实现SimpleChannelInboundHandler的read0()不需要手动释放，因为会自动释放资源
+-- netty内部使用引用计数方式来进行回收，提供工具类ReferenceCountUtil.release(Object msg)来进行及时释放操作
+> 总之，如果一个消息被消费或者丢弃了， 并且没有传递给 ChannelPipeline 中的下一个
+ ChannelOutboundHandler
+ ， 那么用户就有责任调用 ReferenceCountUtil.release()来释放消息。
+ 如果消息到达了实际的传输层， 那么当它被写入时或者 Channel 关闭时，都将被自动释放。
+
+-- EventLoopGroup相当于一个线程组，EventLoop理解成是一个线程，实际上看类继承关系继承与Executor，是一个执行器。
+- ChannelHandlerContext代表了ChannelHandler和ChannelPipeline之间的关系，每当有ChannelHandler添加至ChannelPipeline之中时，
+就会创建ChannelHandlerContext。ChannelHandlerContext的主要作用是管理它所关联的ChannelHandler和在同一个ChannelPipeline中的
+其他ChannelHandler之间的交互。
+-- Channel或ChannelPipeline调用方法会沿着ChannelPipeLine进行传播。而调用ChannelHandlerContext上相同的方法，则将会从当前关联的
+ChannelHandler开始，并且只会传播给位于该ChannelPipeline中的下一个能够处理该事件的ChannelHandler，因此ChannelHandlerContext的事件流更短。
+- 使用ChannelHandlerContext的API的时候，注意两点：1.ChannelHandlerContext和ChannelHandler之间的关系永远不会改变，缓存其引用是安全的；
+2.ChannelHandlerContext的方法将产生更短的事件流，尽可能利用这个特性。
+
