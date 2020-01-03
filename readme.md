@@ -1,20 +1,39 @@
 # netty 学习 -- 哔哩哔哩 张龙老师
 
+
+
+
+
+
+
+
 # Netty in action
--- 当实现ChannelInboundHandler或ChannelInboundHandlerAdapter的channelRead()方法时，需要自行负责释放或池化ByteBuf实例相关内存；
-但是实现SimpleChannelInboundHandler的read0()不需要手动释放，因为会自动释放资源
--- netty内部使用引用计数方式来进行回收，提供工具类ReferenceCountUtil.release(Object msg)来进行及时释放操作
+- 当实现ChannelInboundHandler或ChannelInboundHandlerAdapter的channelRead()方法时，需要自行负责释放或池化ByteBuf实例相关内存；
+  但是实现SimpleChannelInboundHandler的read0()不需要手动释放，因为会自动释放资源
+- netty内部使用引用计数方式来进行回收，提供工具类ReferenceCountUtil.release(Object msg)来进行及时释放操作
 > 总之，如果一个消息被消费或者丢弃了， 并且没有传递给 ChannelPipeline 中的下一个
  ChannelOutboundHandler
  ， 那么用户就有责任调用 ReferenceCountUtil.release()来释放消息。
  如果消息到达了实际的传输层， 那么当它被写入时或者 Channel 关闭时，都将被自动释放。
-
--- EventLoopGroup相当于一个线程组，EventLoop理解成是一个线程，实际上看类继承关系继承与Executor，是一个执行器。
+- EventLoopGroup相当于一个线程组，EventLoop理解成是一个线程，实际上看类继承关系继承与Executor，是一个执行器。
 - ChannelHandlerContext代表了ChannelHandler和ChannelPipeline之间的关系，每当有ChannelHandler添加至ChannelPipeline之中时，
-就会创建ChannelHandlerContext。ChannelHandlerContext的主要作用是管理它所关联的ChannelHandler和在同一个ChannelPipeline中的
-其他ChannelHandler之间的交互。
--- Channel或ChannelPipeline调用方法会沿着ChannelPipeLine进行传播。而调用ChannelHandlerContext上相同的方法，则将会从当前关联的
-ChannelHandler开始，并且只会传播给位于该ChannelPipeline中的下一个能够处理该事件的ChannelHandler，因此ChannelHandlerContext的事件流更短。
+  就会创建ChannelHandlerContext。ChannelHandlerContext的主要作用是管理它所关联的ChannelHandler和在同一个ChannelPipeline中的
+  其他ChannelHandler之间的交互。
+- Channel或ChannelPipeline调用方法会沿着ChannelPipeLine进行传播。而调用ChannelHandlerContext上相同的方法，则将会从当前关联的
+  ChannelHandler开始，并且只会传播给位于该ChannelPipeline中的下一个能够处理该事件的ChannelHandler，因此ChannelHandlerContext的事件流更短。
 - 使用ChannelHandlerContext的API的时候，注意两点：1.ChannelHandlerContext和ChannelHandler之间的关系永远不会改变，缓存其引用是安全的；
-2.ChannelHandlerContext的方法将产生更短的事件流，尽可能利用这个特性。
+  2.ChannelHandlerContext的方法将产生更短的事件流，尽可能利用这个特性。
+- ChannelHandler安装到ChannelPipeline中的过程如下：
+1.一个ChannelInitializer的实现被注册到BootStrap中；
+2.当ChannelInitializer.initChannel()方法被调用时，ChannelInitializer将在ChannelPipeline中安装一组自定义的ChannelHandler；
+3.ChannelInitializer将它自己从ChannelPipeline中移除；
+- 线程池化模式可以理解为：1.从池中的空闲列表中选择一个Thread，并且指派它去运行一个已提交的任务；2.当任务完成时，将该Thread返回给该列表，以供下次使用。
+- EventLoop由一个永远不会改变的Thread驱动，即一个EventLoop代表了一个线程。我们查看EventLoop的继承结构发现实际上我们使用的EventLoop最终都是继承了一个SingleThreadEventLoop，
+也就是实际上EventLoop是一个单线程驱动的。
+- EventLoop默认是与唯一一个线程绑定的，如果有任务提交到该EventLoop，那么将会放在任务队列中并由该确定的线程进行执行，
+一个Channel只会与一个EventLoop绑定，一个EventLoop会绑定多个Channel。
+- **由上方得知永远不要将一个长时间运行的任务放入到执行队列中，因为它将阻塞需要在同一个线程上执行的任何其他任务。如果必须要进行阻塞调用或者执行长时间运行的任务，建议使用EventExecutor**
+- 注意：由于多个Channel共享一个EventLoop(即一个Thread)，所以ThreadLocal使用会有问题。
+- 引导类根据作用不同分为服务器引导类和客户端引导类。服务端使用一个父的Channel来接受来自客户端的连接，并创建子 Channel 以用于它们之间的通信；而客户端将最可能只需要一个单独的、 没有父 Channel 的 Channel 来用于所有的网络交互。
+- Bootstrap 类负责为客户端和使用无连接协议的应用程序创建 Channel
 
