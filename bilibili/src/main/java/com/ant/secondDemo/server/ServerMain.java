@@ -2,6 +2,7 @@ package com.ant.secondDemo.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -24,6 +25,8 @@ public class ServerMain {
                     .channel(NioServerSocketChannel.class)
                     //设置线程处理器，注意childHandler是将处理器交由workerGroup执行,如果是ServerBootstrap的handler方法中指定的处理器是教给parentGroup(bossGoup)线程池处理运行
                     .childHandler(new MySocketServerInitializer())
+                    .option(ChannelOption.SO_KEEPALIVE,true)
+                    .option(ChannelOption.SO_BACKLOG,128)
                     //绑定端口
                     .bind(8899)
                     //同步阻塞运行

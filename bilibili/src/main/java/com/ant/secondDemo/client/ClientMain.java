@@ -11,6 +11,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 /**
  * socket client端
@@ -23,7 +25,16 @@ public class ClientMain {
             ChannelFuture channelFuture = bootstrap
                     .group(eventExecutors)
                     .channel(NioSocketChannel.class)
-                    .handler(new MySockerClientInitializer()).connect("127.0.0.1", 8899).sync();
+                    .handler(new MySockerClientInitializer())
+                    .connect("127.0.0.1", 8899)
+                    .sync();
+            channelFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
+                public void operationComplete(Future<? super Void> future) throws Exception {
+                    if(future.isSuccess()){
+                        System.out.println("服务器连接完成");
+                    }
+                }
+            });
             channelFuture.channel().closeFuture().sync();
         }catch (Exception e){
             e.printStackTrace();
