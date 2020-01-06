@@ -16,5 +16,6 @@ public class WebSockeChannelInitializer extends ChannelInitializer<SocketChannel
         pipeline.addLast(new ChunkedWriteHandler());//组合处理器，主要作用处理大块请求数据
         pipeline.addLast(new HttpObjectAggregator(8192));//聚合http请求
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+        pipeline.addLast(new TextWebsocketFrameChannelHandler());
     }
 }
