@@ -36,4 +36,5 @@
 - 注意：由于多个Channel共享一个EventLoop(即一个Thread)，所以ThreadLocal使用会有问题。
 - 引导类根据作用不同分为服务器引导类和客户端引导类。服务端使用一个父的Channel来接受来自客户端的连接，并创建子 Channel 以用于它们之间的通信；而客户端将最可能只需要一个单独的、 没有父 Channel 的 Channel 来用于所有的网络交互。
 - Bootstrap 类负责为客户端和使用无连接协议的应用程序创建 Channel
+- 消息解码器：ByteToMessageDecoder会对入站数据进行缓冲，直到它准备好处理。
 
