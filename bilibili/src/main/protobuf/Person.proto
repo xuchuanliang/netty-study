@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package com.ant.protoTest;
+
+option java_package = "com.ant.protoTest";
+option java_outer_classname = "Person";
+
+message Info{
+    required string id = 1;
+    optional string name = 2;
+}
