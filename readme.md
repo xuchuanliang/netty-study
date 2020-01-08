@@ -1,4 +1,79 @@
 # netty 学习 -- 哔哩哔哩 张龙老师
+- java中BIO是使用装饰者设计模式，是面向流编程，主要包含InputStream和OutputStream两个概念
+
+- java中NIO是面向块或buffer编程，主要包含Selector、Channel和Buffer三个概念（选择器、管道、缓冲区）；Buffer本身是一块内存，
+底层实现上是一个数组，数据的读、写都是通过Buffer来实现的。具体关系可以参见毕加索·龙画的图，在file中，对应关系就是Thread(1)-->Selector(1)-->Channel(N)-->Buffer(N)；
+其中与BIO的区别是BIO从流（stream）中读取数据，读到一个字节就就是一个字节，而NIO是channel将数据读取到Buffer中，程序从buffer再获取数据，
+程序写数据也是将数据写到Buffer中，然后channel再将数据从buffer写到其他地方；所以BIO中输入和输出流是不兼容的，
+但是NIO中输入和输出都是通过Buffer缓冲区来实现，Buffer同时承担这读和写的工作，所以需要通过调用Buffer的flip()来切换读和写的状态。
+
+- Buffer提供了对于数据的结构化访问，并且可以追踪到系统的读写过程。
+
+- java中8种基本数据类型都包含对应的Buffer类型，如IntBuffer、DoubleBuffer等
+
+- Channel指的是可以向其写入或者从中读取数据的对象，它类似于java.io中的Stream
+
+- 所有数据的读写都是通过Buffer来进行的，永远不会出现直接向Channel写入数据的情况，或者直接从Channel中读取数据的情况。
+
+- 与Stream不同的是，Channel是双向的，但是流只可能是InputStream或者OutputStream，Channel打开后则可以进行读取、写入或者读写
+
+- 由于Channel是双向的，因此它能更好的反映出低层操作系统的真实情况；在Linux系统中，底层操作系统的通道就是双向的。
+
+- **注意通过Channel读和写都是针对Buffer而言的，向Buffer中写数据或者从Buffer中读数据**
+```java
+package com.ant.nio;
+
+import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
+public class Test2 {
+    public static void main(String[] args) throws Exception{
+        FileInputStream fileInputStream = new FileInputStream("D:/code/code_idea/netty-study/bilibili/hello.txt");
+        //转换成Channel
+        FileChannel channel = fileInputStream.getChannel();
+        //创建一个字节Buffer,缓冲区大小是0.5M
+        ByteBuffer byteBuffer = ByteBuffer.allocate(512);
+        //使用channel向byteBuffer中写数据，也就是将硬盘中的文件读出来写到Buffer中
+        channel.read(byteBuffer);
+        //现在byteBuffer还是写的状态
+        //从ByteBuffer中读出数据到内存中，那么需要将ButeBuffer从写的状态切换为读的状态
+        byteBuffer.flip();
+        //开始从ByteBuffer中读数据到内存
+        while (byteBuffer.hasRemaining()){
+            System.out.println((char)byteBuffer.get());
+        }
+    }
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
