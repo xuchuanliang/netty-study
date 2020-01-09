@@ -5,7 +5,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
 
-import static com.ant.PrintUtil.println;
+import static com.ant.PU.println;
 
 public class MyServerInitializer extends ChannelInitializer<SocketChannel> {
 

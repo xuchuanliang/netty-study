@@ -1,11 +1,10 @@
 package com.ant.secondDemo.server;
 
-import com.ant.PrintUtil;
+import com.ant.PU;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 
 import java.util.UUID;
@@ -22,8 +21,8 @@ public class MySocketChannelHandler extends SimpleChannelInboundHandler<String> 
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        PrintUtil.println("客户端连接上");
-        PrintUtil.println(ctx.channel().remoteAddress()+":");
+        PU.println("客户端连接上");
+        PU.println(ctx.channel().remoteAddress()+":");
         ByteBuf byteBuf = Unpooled.buffer("hello i am server".length());
         byteBuf.writeBytes("hello i am server".getBytes());
         String content = "hello i am server";
@@ -35,7 +34,7 @@ public class MySocketChannelHandler extends SimpleChannelInboundHandler<String> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
         try{
-            PrintUtil.println(ctx.channel().remoteAddress()+":"+msg);
+            PU.println(ctx.channel().remoteAddress()+":"+msg);
             ctx.channel().writeAndFlush("from server " + UUID.randomUUID());
         }finally {
             //释放缓存

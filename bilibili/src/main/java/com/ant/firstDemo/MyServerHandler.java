@@ -6,10 +6,9 @@ import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 
-import java.lang.reflect.Method;
 import java.net.URI;
 
-import static com.ant.PrintUtil.println;
+import static com.ant.PU.println;
 
 public class MyServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
