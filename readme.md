@@ -20,6 +20,13 @@
 - 由于Channel是双向的，因此它能更好的反映出低层操作系统的真实情况；在Linux系统中，底层操作系统的通道就是双向的。
 
 - **注意通过Channel读和写都是针对Buffer而言的，向Buffer中写数据或者从Buffer中读数据**
+
+> 对NIO和BIO不同地方的个人理解（以从硬盘中读取数据为例）：
+>BIO中相当于我们程序通过InputStream和OutputStream直接与硬盘建立通道进行交互，从硬盘中直接读取数据或者写入数据；
+>byteBuffer实际上指的是一块内存空间，NIO中程序直接与ByteBuffer进行交互，向byteBuffer中进行读写数据，Channel相当于ByteBuffer与硬盘之间的管道，
+>Channel负责将byteBuffer中的数据写入硬盘或将硬盘中的数据读取到byteBuffer中，因此每一次一次的IO操作涉及到首先程序向ByteBuffer中写数据，
+>然后Channel从ByteBuffer中读数据写到硬盘，所以每一次都需要调用byteBuffer.filp()方法来切换byteBuffer的读写状态
+>总而言之，NIO相当于是把原来的BIO的一步操作切断成两步操作，并且数据通过中间的一个数据缓冲区（ByteBuffer，即从内存中开辟的一个数组空间）来进行中转。详情可看本项目file中的：NIO和BIO的个人理解本质区别.png
 ```java
 package com.ant.nio;
 
