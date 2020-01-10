@@ -1,12 +1,12 @@
 package com.ant.nio;
 
-import com.ant.PrintUtil;
 
 import java.nio.IntBuffer;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import static com.ant.PrintUtil.*;
+import static com.ant.PU.println;
+
 
 public class Test {
     public static void main(String[] args) {

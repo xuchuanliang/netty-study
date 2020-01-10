@@ -30,8 +30,6 @@
 
 - Nio中的Buffer的操作方法分为两种，一种是绝对方法，一种是相对方法，源码注释中分别是Relative和Absolute，相对方法会移动position，绝对方法不会移动position
 
-
-
 - Buffer中三个重要的属性：capacity是总容量，不可变的；limit是第一个不能被读或者写的数据的索引；position是下一个应该被读或者写的索引
 >通过查看源码我们了解一下IntBuffer的一些细节：
 >> 1.IntBuffer.allocate(10)，构建IntBuffer中我们可以看到实际上创建的是IntHeapBuffer()对象，IntHeapBuffer是IntBuffer的一个子类，是在堆内存中开辟一个数组空间，Buffer的数据是存放在这个数组中的。
@@ -40,6 +38,14 @@
 >> 3.intBuffer.flip()方法就是重置intBuffer，实际上是将limit的位置指向现在position位置，并把position的位置置为0，这样就可以在由读转到写或反之时，能够从0位置开始读或写直到原position(现在limit)的位置
 >> 4.intBuffer.clear()将intBuffer置空，看源码实际上是将position置为0，将limit置为与capacity位置相同，mark置为-1（即置为无效）
 
+- 在java传统的堆内存模型下，java程序通过IO写或读数据实际上在java堆外内存，操作系统会开辟一个空间，那么IO实际上是数据是从JVM管理的堆内存拷贝到操作系统开辟的新的内存中，
+然后操作系统将该数据写出至IO设备，反过来读数据也是一样，先读取到操作系统开辟的内存空间中，然后再由JVM拷贝到java堆中，所以这里多了一次拷贝消耗。
+- 使用NIO的DirectBuffer，就是直接在堆外内存开辟了一个内存空间，java中的DirectBuffer持有该内存空间的地址，当然DirectBuffer对象还是在堆中，
+只不过该对象持有堆外开辟的内存地址，这样就避免了多次内存拷贝，实现了零拷贝。
+- 疑问：操作系统实际上是能够直接访问到JVM管理的内存空间，为什么使用HeapByteBuffer时操作系统不直接访问来操作，不就不用多拷贝了吗？
+但是这样做是有原因的，如果这样操作必须是使用JNI的方式来操作，但是JNI的方式有必须要求内存地址是确定的，但是JVM垃圾收集时会通过标记清除算法进行清除，
+那么对象的内存地址会移动，那么就无法进行GC操作，这样肯定也是有问题的。
+- 在内存拷贝的时候GC会保证不发生垃圾回收，因为拷贝相对于IO动作很快，这一块由GC保证。
 
 ```java
 package com.ant.nio;
