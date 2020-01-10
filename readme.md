@@ -31,6 +31,16 @@
 - Nio中的Buffer的操作方法分为两种，一种是绝对方法，一种是相对方法，源码注释中分别是Relative和Absolute，相对方法会移动position，绝对方法不会移动position
 
 
+
+- Buffer中三个重要的属性：capacity是总容量，不可变的；limit是第一个不能被读或者写的数据的索引；position是下一个应该被读或者写的索引
+>通过查看源码我们了解一下IntBuffer的一些细节：
+>> 1.IntBuffer.allocate(10)，构建IntBuffer中我们可以看到实际上创建的是IntHeapBuffer()对象，IntHeapBuffer是IntBuffer的一个子类，是在堆内存中开辟一个数组空间，Buffer的数据是存放在这个数组中的。
+>> 在NIO中与HeapBuffer相对应的是DirectBuffer，直接内存跟NIO的零拷贝关系比较紧密。
+>> 2.intBuffer.put()操作实际上就是将数据放置到int数组中，且将position向后移一位
+>> 3.intBuffer.flip()方法就是重置intBuffer，实际上是将limit的位置指向现在position位置，并把position的位置置为0，这样就可以在由读转到写或反之时，能够从0位置开始读或写直到原position(现在limit)的位置
+>> 4.intBuffer.clear()将intBuffer置空，看源码实际上是将position置为0，将limit置为与capacity位置相同，mark置为-1（即置为无效）
+
+
 ```java
 package com.ant.nio;
 
@@ -58,39 +68,6 @@ public class Test2 {
 }
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Netty in action
