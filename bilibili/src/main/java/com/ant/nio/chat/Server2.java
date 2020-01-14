@@ -26,8 +26,8 @@ public class Server2 {
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         //2.设置Channel的模式是非阻塞
         serverSocketChannel.configureBlocking(false);
-        //3.获取ServerSocket，绑定监听端口
-        serverSocketChannel.socket().bind(new InetSocketAddress(8899));
+        //3.绑定监听端口
+        serverSocketChannel.bind(new InetSocketAddress(8899));
         //4.创建Selector
         Selector selector = Selector.open();
         //5.将ServerSocketChannel绑定到Selector，并且由于目前还没建立连接，则建立客户端的连接事件
